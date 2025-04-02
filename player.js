@@ -1,27 +1,32 @@
-document.addEventListener('DOMContentLoaded', function() {
-  // Playlist data
-  const playlist = [
-    {
-      title: "Why We Lose (feat. Coleman Trapp)",
-      artist: "NCS",
-      src: "assets/music/Cartoon, Jéja - Why We Lose.mp3",
-    },
-    {
-      title: "MAYDAY",
-      artist: "TheFatRat",
-      src: "assets/music/MAYDAY.mp3",
-    },
-    {
-      title: "The Throes of Winter",
-      artist: "Ghost Data",
-      src: "assets/music/GHOST_DATA.mp3",
-    },
-    {
-      title: "Heart Shaped Box",
-      artist: "Neovaii",
-      src: "assets/music/Neovaii - Heart Shaped Box.mp3",
-    }
-  ];
+async function fetchAndProcessData() {
+  try {
+    const response = await fetch('https://synctube-api.onrender.com/sync', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        playlist_url: 'https://youtube.com/playlist?list=PLbpytgpi11Wq3tvbG4z4m2-HFGfXRbyUC&si=ujdh8gCT7JJGIWyT'
+      })
+    });
+
+    const data = await response.json();
+    if (!data.output) return [];
+
+    return Object.entries(data.output).map(([url, info]) => ({
+      title: info.title,
+      artist: info.artist,
+      src: url
+    }));
+  } catch (error) {
+    console.error("Error fetching data:", error);
+    return [];
+  }
+}
+
+document.addEventListener('DOMContentLoaded', async function () {
+//Playlist data
+const playlist = await fetchAndProcessData();
 
 // DOM elements
 const playerContainer = document.querySelector('.music-player-container');
@@ -43,6 +48,7 @@ const volumeSlider = document.getElementById('volume-slider');
 
 // Audio setup
 const audio = new Audio();
+audio.crossOrigin = "anonymous";
 audio.volume = volumeSlider.value;
 
 // Visualizer setup
