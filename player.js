@@ -12,6 +12,8 @@ async function fetchAndProcessData() {
 
     const data = await response.json();
     if (!data.output) return [];
+    
+    localStorage.setItem("metadata_playlist", JSON.stringify(data.output));
 
     return Object.entries(data.output).map(([url, info]) => ({
       title: info.title,
@@ -20,6 +22,17 @@ async function fetchAndProcessData() {
     }));
   } catch (error) {
     console.error("Error fetching data:", error);
+    const cachedData = localStorage.getItem("metadata_playlist");
+
+    if (cachedData) {
+      const parsedData = JSON.parse(cachedData);
+      return Object.entries(parsedData).map(([url, info]) => ({
+        title: info.title,
+        artist: info.artist,
+        src: url
+      }));
+    }
+
     return [];
   }
 }
