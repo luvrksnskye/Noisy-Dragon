@@ -9,6 +9,8 @@ async function fetchAndProcessData() {
         playlist_url: 'https://youtube.com/playlist?list=PLbpytgpi11Wq3tvbG4z4m2-HFGfXRbyUC&si=ujdh8gCT7JJGIWyT'
       })
     });
+    
+    if(!response.ok) throw new Error(`Server Error: ${response.status}`)    
 
     const data = await response.json();
     if (!data.output) return [];
